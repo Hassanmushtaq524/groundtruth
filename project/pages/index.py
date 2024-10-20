@@ -10,7 +10,7 @@ class Update(rx.Base):
     relevant_doc: str
     doc_url: str
     code_summary: str
-    doc_updates: str
+    doc_updates: str | None
 
 class RecentUpdatesState(State):
     updates: List[Update] = []
@@ -34,7 +34,7 @@ def sidebar_component():
     return rx.vstack(
         rx.heading("Commits", size="md", mb=4),
         rx.foreach(
-            RecentUpdatesState.updates,
+            RecentUpdatesState.updates[::-1],  # Reverse the order of updates
             lambda update: rx.button(
                 update.commit_message,
                 on_click=RecentUpdatesState.select_update(update.commit_id),
@@ -43,7 +43,10 @@ def sidebar_component():
                 py=2,
                 height="1.5rem",
                 variant="ghost",
-                font_size="1.4em",  # Increased font size
+                font_size="1.2em",  # Increased font size
+                text_overflow="ellipsis",
+                overflow="hidden",
+                white_space="nowrap",
             )
         ),
         width="25vw",
