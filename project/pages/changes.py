@@ -78,7 +78,7 @@ def main_content():
 
 # Update the page definition
 @rx.page("/changes")
-def index():
+def changes():
     return rx.hstack(
         sidebar_component(),
         main_content(),

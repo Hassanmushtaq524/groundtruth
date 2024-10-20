@@ -108,8 +108,7 @@ def render_link_repository_box():
     )
 
 @rx.page("/")
-def landing() -> rx.Component:
-
+def home() -> rx.Component:
     return rx.vstack(
         render_navbar(),  # Keep the "GROUNDTRUTH" text in place
         rx.box(

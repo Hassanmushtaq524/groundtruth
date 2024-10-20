@@ -1,5 +1,5 @@
 import reflex as rx
-from project.pages import *
+from project.pages import home, changes
 from backend.api import app as fastapi_app 
 from dotenv import load_dotenv
 
