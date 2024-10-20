@@ -36,17 +36,18 @@ def sidebar_component():
         rx.foreach(
             RecentUpdatesState.updates,
             lambda update: rx.button(
-                update.commit_id,
+                update.commit_message,
                 on_click=RecentUpdatesState.select_update(update.commit_id),
                 width="100%",
                 justify_content="flex-start",
                 py=2,
+                height="1.5rem",
                 variant="ghost",
+                font_size="1.4em",  # Increased font size
             )
         ),
-        width="250px",
-        height="100vh",
-        border_right="1px solid #e0e0e0",
+        width="25vw",
+        height="100%",
         padding="1em",
     )
 
@@ -54,19 +55,18 @@ def main_content():
     return rx.cond(
         RecentUpdatesState.selected_update,
         rx.vstack(
-            rx.heading(RecentUpdatesState.selected_update.commit_message, size="lg", mb=4),
             rx.hstack(
-                rx.text("Relevant Doc: ", font_weight="bold"),
-                rx.link(
-                    RecentUpdatesState.selected_update.relevant_doc,
-                    href=RecentUpdatesState.selected_update.doc_url,
-                    is_external=True
+                rx.heading(RecentUpdatesState.selected_update.commit_message, size="lg", mb=4),
+                rx.text(
+                    RecentUpdatesState.selected_update.commit_id[:7],  # Display first 7 characters of commit ID
+                    color="#A0AEC0",  # Light gray color for better visibility
+                    font_size="0.875em",  # Equivalent to "sm", but more explicit
+                    align_self="flex-end",
+                    ml="0.5rem"  # More precise margin-left value
                 ),
-                width="100%",
             ),
-            rx.text("Code Summary:", font_weight="bold"),
-            rx.text(RecentUpdatesState.selected_update.code_summary, mb=2),
-            rx.text("Doc Updates:", font_weight="bold"),
+            rx.markdown(RecentUpdatesState.selected_update.code_summary, mb=2),
+            rx.link(f"Updates to {RecentUpdatesState.selected_update.relevant_doc} Documentation", href=RecentUpdatesState.selected_update.doc_url, is_external=True, font_weight="bold", font_size="2em"),
             rx.markdown(RecentUpdatesState.selected_update.doc_updates),
             align_items="start",
             spacing="0.5em",
