@@ -1,13 +1,15 @@
 import reflex as rx
-from project.pages import *
+from project.pages import home, changes
+from project.styles.styles import custom_theme
 from backend.api import app as fastapi_app 
 from dotenv import load_dotenv
 
-class State(rx.State):
-    """Define empty state to allow access to rx.State.router."""
+style = {
+    "background-color": "white"
+}
 
+app = rx.App(style=style, theme=custom_theme)
 
-app = rx.App()
 app.api = fastapi_app
 
 if __name__ == "__main__":

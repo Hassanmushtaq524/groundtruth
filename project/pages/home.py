@@ -4,15 +4,12 @@ import reflex as rx
 from project.state import State
 
 from project.components.navbar import render_navbar
-from project.components.query import render_query_component
-from project.components.output import render_output
-from project.states.queries import QueryAPI
 
 class DashboardState(State):
     repo_link: str = ""
 
     def navigate_to_next_page(self):
-        return rx.redirect("/next_page")
+        return rx.redirect("/changes")
 
 def render_getting_started_text():
     return rx.box(
@@ -73,8 +70,7 @@ def render_getting_started_text():
         width="100%",
         display="flex",
         justify_content="flex-start",
-        align_items="center",
-        margin_left="-30px",  # Move the "GETTING STARTED" text 30px to the left
+        align_items="center"# Move the "GETTING STARTED" text 30px to the left
     )
 
 def render_link_repository_box():
@@ -82,16 +78,14 @@ def render_link_repository_box():
         rx.input(
             placeholder="Link your repository",
             value=DashboardState.repo_link,
-            on_change=DashboardState.set_repo_link,
             font_family="Helvetica Neue LT Std",
             font_size="32px",
-            color="#787777",
+            color="black",
             width="521px",
             height="56px",
-            border="2px solid #C48DFF",
-            border_radius="12px",
-            box_shadow="0 4px 8px rgba(0, 0, 0, 0.1)",
+            border="1px solid #C48DFF",
             padding_left="10px",
+            background="transparent"
         ),
         rx.button(
             rx.icon(
@@ -102,25 +96,17 @@ def render_link_repository_box():
             ),
             bg="#C48DFF",
             color="white",
-            border_radius="12px",
             height="56px",
             width="56px",
             _hover={"bg": "#A76FE3"},
-            box_shadow="0 4px 8px rgba(196, 141, 255, 0.3)",
             on_click=DashboardState.navigate_to_next_page,
         ),
         spacing="4",
-        margin_top="20px",
-        margin_left="50px",
+        padding_left="70px",
     )
 
-@rx.page("/", on_load=QueryAPI.run_get_request)
-def dashboard() -> rx.Component:
-    """The dashboard page.
-
-    Returns:
-        The UI for the dashboard page.
-    """
+@rx.page("/")
+def home() -> rx.Component:
     return rx.vstack(
         render_navbar(),  # Keep the "GROUNDTRUTH" text in place
         rx.box(
@@ -133,23 +119,6 @@ def dashboard() -> rx.Component:
             margin_top="130px",
         ),
         render_link_repository_box(),  # Add the new box here
-        rx.hstack(
-            render_query_component(),
-            render_output(),
-            width="100%",
-            display="flex",
-            flex_wrap="wrap",
-            spacing="6",
-            padding="2em 1em",
-            margin_left="-30px",  # Move the query and output components 30px to the left
-        ),
         spacing="4",
         display="flex",
-    )
-
-@rx.page("/next_page")
-def next_page():
-    return rx.vstack(
-        rx.heading("Next Page"),
-        rx.text("This is an empty page for now."),
     )
