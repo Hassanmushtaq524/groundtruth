@@ -9,3 +9,4 @@ backend/.env
 myenv/*
 .env
 
+my_env
