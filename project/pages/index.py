@@ -49,7 +49,7 @@ def recent_updates_component():
                         rx.text("Code Summary:", font_weight="bold"),
                         rx.text(update.code_summary, mb=2),
                         rx.text("Doc Updates:", font_weight="bold"),
-                        rx.text(update.doc_updates),
+                        rx.markdown(update.doc_updates),
                         align_items="start",
                         spacing="0.5em",
                     ),
