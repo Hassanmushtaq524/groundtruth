@@ -37,6 +37,7 @@ async def handle_webhook(request: Request):
         closest_match = find_most_similar_doc(code_desc)
         # Now update docs with Groq.
         updated_docs = update_docs(closest_match, code_diffs)
+        
         summary = {
             "commit_id": payload['after'],
             "commit_message": payload['head_commit']['message'],
@@ -45,8 +46,6 @@ async def handle_webhook(request: Request):
             "code_summary": code_desc,
             "doc_updates": updated_docs
         }
-        # TODO: remove this
-        print(summary)
         # Read existing updates
         try:
             with open(UPDATES_FILE, 'r') as f:
@@ -70,7 +69,6 @@ async def handle_webhook(request: Request):
     
 @app.get("/api/recent-updates")
 async def get_recent_updates():
-    print("Getting recent updates")
     try:
         with open(UPDATES_FILE, 'r') as f:
             updates = json.load(f)

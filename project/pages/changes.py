@@ -5,6 +5,10 @@ import json
 import httpx
 import os
 from project.components.navbar import render_navbar
+import reflex as rx
+from project.state import State
+from typing import List
+import asyncio
 
 class Update(rx.Base):
     commit_id: str
@@ -17,23 +21,37 @@ class Update(rx.Base):
 class RecentUpdatesState(State):
     updates: List[Update] = []
     selected_update: Update = None
+    last_update_time: float = 0
 
-    async def get_recent_updates(self):
+    async def fetch_recent_updates(self):
         try:
-            # Make an asynchronous GET request to the server to fetch recent updates
             async with httpx.AsyncClient() as client:
                 response = await client.get("http://localhost:8000/api/recent-updates")
-                response.raise_for_status()  # Raise an error for bad status codes
+                response.raise_for_status()
                 data = response.json()
-            
-            # Parse the JSON data into Update objects
-            self.updates = [Update(**item) for item in data]
+            return [Update(**item) for item in data], asyncio.get_event_loop().time()
         except Exception as e:
             print(f"Error fetching recent updates: {e}")
-            self.updates = []
+            return [], asyncio.get_event_loop().time()
+
+    async def get_recent_updates(self):
+        new_updates, update_time = await self.fetch_recent_updates()
+        self.updates = new_updates
+        self.last_update_time = update_time
+
+    @rx.background
+    async def poll_for_updates(self):
+        while True:
+            await asyncio.sleep(2)  # Poll every 5 seconds
+            new_updates, update_time = await self.fetch_recent_updates()
+            async with self:
+                self.updates = new_updates
+                self.last_update_time = update_time
 
     def select_update(self, update_id: str):
         self.selected_update = next((u for u in self.updates if u.commit_id == update_id), None)
+
+
 
 def sidebar_component():
     return rx.vstack(
@@ -103,7 +121,10 @@ def changes():
         rx.hstack(
             sidebar_component(),
             main_content(),
-            on_mount=RecentUpdatesState.get_recent_updates,
+            on_mount=[
+                RecentUpdatesState.get_recent_updates,
+                RecentUpdatesState.poll_for_updates
+            ],
             width="100%",
             height="100vh",
         ))
