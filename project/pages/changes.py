@@ -16,7 +16,7 @@ class Update(rx.Base):
     relevant_doc: str
     doc_url: str
     code_summary: str
-    doc_updates: str
+    doc_updates: str | None
 
 class RecentUpdatesState(State):
     updates: List[Update] = []
@@ -62,7 +62,7 @@ def sidebar_component():
                    font_family="Helvetica Neue LT Std",
                    font_weight="bold"),
         rx.foreach(
-            RecentUpdatesState.updates,
+            RecentUpdatesState.updates[::-1],  # Reverse the order of updates
             lambda update: rx.button(
                 update.commit_message,
                 on_click=RecentUpdatesState.select_update(update.commit_id),
