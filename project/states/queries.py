@@ -17,7 +17,7 @@ class QueryState(BaseState):
     post_params_body: list[str] = [
         "JSON",
         "Raw",
-        "x-www-form-urlencoded",
+        "x-www-form-urlencoded", 
         "Form Data",
         "Binary",
         "None",

@@ -1,7 +1,7 @@
 import os
 from groq import Groq
-# import chromadb
-# from chromadb.utils import embedding_functions
+import chromadb
+from chromadb.utils import embedding_functions
 import os
 from dotenv import load_dotenv
 
@@ -10,6 +10,8 @@ import requests
 import base64
 import re
 from openai import OpenAI
+
+
 
 
 groq_client = Groq(

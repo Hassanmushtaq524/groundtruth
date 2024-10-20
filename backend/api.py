@@ -68,6 +68,7 @@ async def handle_webhook(request: Request):
     
 @app.get("/api/recent-updates")
 async def get_recent_updates():
+    print("Getting recent updates")
     try:
         with open(UPDATES_FILE, 'r') as f:
             updates = json.load(f)
