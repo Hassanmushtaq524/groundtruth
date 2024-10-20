@@ -6,6 +6,7 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
+
 import requests
 import base64
 import re
@@ -15,18 +16,18 @@ from openai import OpenAI
 
 
 groq_client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
+    api_key=os.getenv("GROQ_API_KEY"),
 )
 
 # Initialize OpenAI embedding function
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=os.getenv("OPENAI_API_KEY"),
     model_name="text-embedding-ada-002"
 )
 
 # Initialize OpenAI client
 openai_client = OpenAI(
-    api_key=os.environ.get("OPENAI_API_KEY")
+    api_key=os.getenv("OPENAI_API_KEY")
 )
 
 

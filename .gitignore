@@ -1,12 +1,11 @@
+
 *.db
 *.py[cod]
+.env
 .web
 __pycache__
 __pycache__/
 assets/external/
 backend/.env
-
-myenv/*
-.env
-
 my_env
+myenv/*

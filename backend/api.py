@@ -3,6 +3,7 @@ from fastapi import FastAPI, Request
 from backend.utils.utils import generate_code_description, update_docs, find_most_similar_doc
 import requests
 import json
+
 # Specify the path to the .env file
 app = FastAPI()
 UPDATES_FILE = "updates.json"
@@ -44,7 +45,8 @@ async def handle_webhook(request: Request):
             "code_summary": code_desc,
             "doc_updates": updated_docs
         }
-        
+        # TODO: remove this
+        print(summary)
         # Read existing updates
         try:
             with open(UPDATES_FILE, 'r') as f:

@@ -22,7 +22,7 @@ class RecentUpdatesState(State):
         try:
             # Make an asynchronous GET request to the server to fetch recent updates
             async with httpx.AsyncClient() as client:
-                response = await client.get("http://localhost:8001/api/recent-updates")
+                response = await client.get("http://localhost:8000/api/recent-updates")
                 response.raise_for_status()  # Raise an error for bad status codes
                 data = response.json()
             
@@ -31,16 +31,6 @@ class RecentUpdatesState(State):
         except Exception as e:
             print(f"Error fetching recent updates: {e}")
             self.updates = []
-
-        # try:
-        #     # Adjust this path to the location of your updates.json file
-        #     file_path = os.path.join(os.path.dirname(__file__), '../../', 'updates.json')
-        #     with open(file_path, 'r') as f:
-        #         data = json.load(f)
-        #     self.updates = [Update(**item) for item in data]
-        # except Exception as e:
-        #     print(f"Error fetching recent updates: {e}")
-        #     self.updates = []
 
     def select_update(self, update_id: str):
         self.selected_update = next((u for u in self.updates if u.commit_id == update_id), None)
