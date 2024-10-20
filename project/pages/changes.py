@@ -3,6 +3,7 @@ from project.state import State
 from typing import List
 import json
 import os
+from project.components.navbar import render_navbar
 
 class Update(rx.Base):
     commit_id: str
@@ -32,7 +33,12 @@ class RecentUpdatesState(State):
 
 def sidebar_component():
     return rx.vstack(
-        rx.heading("Commits", size="md", mb=4),
+        rx.heading("COMMITS", 
+                   size="md", 
+                   mb=4, 
+                   color="black",
+                   font_family="Helvetica Neue LT Std",
+                   font_weight="bold"),
         rx.foreach(
             RecentUpdatesState.updates,
             lambda update: rx.button(
@@ -41,13 +47,15 @@ def sidebar_component():
                 width="100%",
                 justify_content="flex-start",
                 py=2,
-                variant="ghost",
+                variant="ghost"
             )
         ),
-        width="250px",
+        display="flex",
+        gap="40px",
+        width="fit-content",
         height="100vh",
-        border_right="1px solid #e0e0e0",
-        padding="1em",
+        border_right="1px solid #C48DFF",
+        padding="70px",
     )
 
 def main_content():
@@ -71,18 +79,27 @@ def main_content():
             align_items="start",
             spacing="0.5em",
             width="100%",
-            padding="2em",
+            padding="70px",
+            color="black",
+            height="100vh"
         ),
-        rx.text("Select a commit from the sidebar to view details.", font_style="italic"),
+        rx.text("Select a commit from the sidebar to view details.", 
+                    font_style="italic", 
+                    color="black",
+                    font_family="Helvetica Neue LT Std",
+                    font_weight="bold",
+                    padding="70px"),
     )
 
 # Update the page definition
 @rx.page("/changes")
 def changes():
-    return rx.hstack(
-        sidebar_component(),
-        main_content(),
-        on_mount=RecentUpdatesState.get_recent_updates,
-        width="100%",
-        height="100vh",
-    )
+    return rx.vstack(        
+        render_navbar(),
+        rx.hstack(
+            sidebar_component(),
+            main_content(),
+            on_mount=RecentUpdatesState.get_recent_updates,
+            width="100%",
+            height="100vh",
+        ))

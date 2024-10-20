@@ -17,7 +17,7 @@ export default function ChakraColorModeProvider({ children }) {
 
   const rawColorMode = colorMode;
   const setColorMode = (mode) => {
-    const allowedModes = ["light", "dark", "system"];
+    const allowedModes = ["light", "light", "light"];
     if (!allowedModes.includes(mode)) {
       console.error(
         `Invalid color mode "${mode}". Defaulting to "${defaultColorMode}".`

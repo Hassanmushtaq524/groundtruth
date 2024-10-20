@@ -70,8 +70,7 @@ def render_getting_started_text():
         width="100%",
         display="flex",
         justify_content="flex-start",
-        align_items="center",
-        margin_left="-30px",  # Move the "GETTING STARTED" text 30px to the left
+        align_items="center"# Move the "GETTING STARTED" text 30px to the left
     )
 
 def render_link_repository_box():
@@ -79,14 +78,14 @@ def render_link_repository_box():
         rx.input(
             placeholder="Link your repository",
             value=DashboardState.repo_link,
-            on_change=DashboardState.set_repo_link,
             font_family="Helvetica Neue LT Std",
             font_size="32px",
-            color="#787777",
+            color="black",
             width="521px",
             height="56px",
-            border="2px solid #C48DFF",
+            border="1px solid #C48DFF",
             padding_left="10px",
+            background="transparent"
         ),
         rx.button(
             rx.icon(
@@ -103,8 +102,7 @@ def render_link_repository_box():
             on_click=DashboardState.navigate_to_next_page,
         ),
         spacing="4",
-        margin_top="20px",
-        margin_left="50px",
+        padding_left="70px",
     )
 
 @rx.page("/")
