@@ -1,22 +1,24 @@
 import os
 from groq import Groq
-import chromadb
-from chromadb.utils import embedding_functions
+# import chromadb
+# from chromadb.utils import embedding_functions
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 groq_client = Groq(
-    api_key=os.environ.get("GROQ_API_KEY"),
+    api_key=os.getenv("GROQ_API_KEY"),
 )
 
 # Initialize OpenAI embedding function
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=os.getenv("OPENAI_API_KEY"),
     model_name="text-embedding-ada-002"
 )
 
 # Initialize Chroma client with persistence
 chroma_client = chromadb.PersistentClient(path="../../chroma_db")
-
 
 # Get the existing collection
 collection = chroma_client.get_collection(name="sentry_docs", embedding_function=openai_ef)
