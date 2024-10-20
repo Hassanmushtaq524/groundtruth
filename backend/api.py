@@ -1,6 +1,7 @@
 # api.py
 from fastapi import FastAPI, Request
 from backend.utils.utils import generate_code_description
+from backend.utils.utils import find_most_similar_docs
 import requests
 # Specify the path to the .env file
 app = FastAPI()
@@ -17,10 +18,6 @@ Endpoints
 
 """
 
-@app.get("/api/")
-async def read_root():
-    return {"message": "success"}, 200
-
 
 # Webhook endpoint to listen for POST requests
 @app.post("/api/webhook")
@@ -33,7 +30,10 @@ async def handle_webhook(request: Request):
         code_diffs =  get_commit_details(owner, name, payload['after'])
         print(code_diffs)
         code_desc = generate_code_description(code_diffs)
+
         print(code_desc)
+        closest_match = find_most_similar_docs(code_desc)
+        print(closest_match)
         return 200
 
 

@@ -5,4 +5,7 @@ __pycache__
 __pycache__/
 assets/external/
 backend/.env
-my_env
+
+myenv/*
+.env
+
