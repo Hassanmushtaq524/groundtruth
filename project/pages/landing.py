@@ -4,15 +4,12 @@ import reflex as rx
 from project.state import State
 
 from project.components.navbar import render_navbar
-from project.components.query import render_query_component
-from project.components.output import render_output
-from project.states.queries import QueryAPI
 
 class DashboardState(State):
     repo_link: str = ""
 
     def navigate_to_next_page(self):
-        return rx.redirect("/next_page")
+        return rx.redirect("/changes")
 
 def render_getting_started_text():
     return rx.box(
@@ -89,8 +86,6 @@ def render_link_repository_box():
             width="521px",
             height="56px",
             border="2px solid #C48DFF",
-            border_radius="12px",
-            box_shadow="0 4px 8px rgba(0, 0, 0, 0.1)",
             padding_left="10px",
         ),
         rx.button(
@@ -102,11 +97,9 @@ def render_link_repository_box():
             ),
             bg="#C48DFF",
             color="white",
-            border_radius="12px",
             height="56px",
             width="56px",
             _hover={"bg": "#A76FE3"},
-            box_shadow="0 4px 8px rgba(196, 141, 255, 0.3)",
             on_click=DashboardState.navigate_to_next_page,
         ),
         spacing="4",
@@ -114,13 +107,9 @@ def render_link_repository_box():
         margin_left="50px",
     )
 
-@rx.page("/", on_load=QueryAPI.run_get_request)
-def dashboard() -> rx.Component:
-    """The dashboard page.
+@rx.page("/")
+def landing() -> rx.Component:
 
-    Returns:
-        The UI for the dashboard page.
-    """
     return rx.vstack(
         render_navbar(),  # Keep the "GROUNDTRUTH" text in place
         rx.box(
@@ -133,23 +122,6 @@ def dashboard() -> rx.Component:
             margin_top="130px",
         ),
         render_link_repository_box(),  # Add the new box here
-        rx.hstack(
-            render_query_component(),
-            render_output(),
-            width="100%",
-            display="flex",
-            flex_wrap="wrap",
-            spacing="6",
-            padding="2em 1em",
-            margin_left="-30px",  # Move the query and output components 30px to the left
-        ),
         spacing="4",
         display="flex",
-    )
-
-@rx.page("/next_page")
-def next_page():
-    return rx.vstack(
-        rx.heading("Next Page"),
-        rx.text("This is an empty page for now."),
     )
