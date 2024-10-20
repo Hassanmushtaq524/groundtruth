@@ -2,6 +2,7 @@ import reflex as rx
 from project.state import State
 from typing import List
 import json
+import httpx
 import os
 from project.components.navbar import render_navbar
 
@@ -17,16 +18,29 @@ class RecentUpdatesState(State):
     updates: List[Update] = []
     selected_update: Update = None
 
-    def get_recent_updates(self):
+    async def get_recent_updates(self):
         try:
-            # Adjust this path to the location of your updates.json file
-            file_path = os.path.join(os.path.dirname(__file__), '../../', 'updates.json')
-            with open(file_path, 'r') as f:
-                data = json.load(f)
+            # Make an asynchronous GET request to the server to fetch recent updates
+            async with httpx.AsyncClient() as client:
+                response = await client.get("http://localhost:8001/api/recent-updates")
+                response.raise_for_status()  # Raise an error for bad status codes
+                data = response.json()
+            
+            # Parse the JSON data into Update objects
             self.updates = [Update(**item) for item in data]
         except Exception as e:
             print(f"Error fetching recent updates: {e}")
             self.updates = []
+
+        # try:
+        #     # Adjust this path to the location of your updates.json file
+        #     file_path = os.path.join(os.path.dirname(__file__), '../../', 'updates.json')
+        #     with open(file_path, 'r') as f:
+        #         data = json.load(f)
+        #     self.updates = [Update(**item) for item in data]
+        # except Exception as e:
+        #     print(f"Error fetching recent updates: {e}")
+        #     self.updates = []
 
     def select_update(self, update_id: str):
         self.selected_update = next((u for u in self.updates if u.commit_id == update_id), None)
@@ -81,7 +95,8 @@ def main_content():
             width="100%",
             padding="70px",
             color="black",
-            height="100vh"
+            height="100vh",
+            overflow_y="scroll"
         ),
         rx.text("Select a commit from the sidebar to view details.", 
                     font_style="italic", 
