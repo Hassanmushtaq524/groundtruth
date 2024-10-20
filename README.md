@@ -40,6 +40,25 @@ Step-by-step guide to install and run the project.
    ```bash
    ngrok HTTP <BACKEND_PORT>
 
+### Dependencies
+List of dependencies:
+
+1. reflex
+2. chromadb
+3. openai
+4. groq
+5. reflex>=0.6.0a
+6. reflex-chakra
+7. requests
+8. json
+9. fastapi
+10. os
+11. re
+12. base64
+13. dotenv
+14. typing
+15. httpx
+   
 ### Usage
 Step-by-step guide to use and run the project.
 
@@ -48,4 +67,10 @@ Step-by-step guide to use and run the project.
    reflex run
 
 Make sure reflex is set up to run. This will launch both your backend and your frontend.
+
+### Contributers
+Hassan Mushtaq: [Hassanmushtaq524](https://github.com/hassanmushtaq524)
+Joe Malatesta: [Joe Malatesta](https://github.com/joemmalatesta)
+Yashwanth Alluri: [Yashwanth Alluri](https://github.com/yashalluri)
+
 
