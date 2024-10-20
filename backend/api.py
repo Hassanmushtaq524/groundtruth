@@ -1,10 +1,12 @@
 # api.py
 from fastapi import FastAPI, Request
-from backend.utils.utils import generate_code_description
-from backend.utils.utils import find_most_similar_docs
+from backend.utils.utils import generate_code_description, update_docs, find_most_similar_doc
 import requests
+import json
 # Specify the path to the .env file
 app = FastAPI()
+UPDATES_FILE = "updates.json"
+
 
 """
 Endpoints
@@ -23,18 +25,55 @@ Endpoints
 @app.post("/api/webhook")
 async def handle_webhook(request: Request):
     payload = await request.json()
-    # Initialize lists for storing file content
-    if payload['ref'] == "refs/heads/main" or payload['ref'] == "refs/heads/master" or payload['ref'] == "refs/heads/develop":
+    if payload['ref'] in ["refs/heads/main", "refs/heads/master", "refs/heads/develop"]:
         owner = payload['repository']['owner']['name']
         name = payload['repository']['name']
+        # Get diffs and filenames to pass to Groq
         code_diffs =  get_commit_details(owner, name, payload['after'])
-        print(code_diffs)
+        # Make a code description with Groq
         code_desc = generate_code_description(code_diffs)
-
-        print(code_desc)
-        closest_match = find_most_similar_docs(code_desc)
-        print(closest_match)
-        return 200
+        # Query Chroma for most similar doc
+        closest_match = find_most_similar_doc(code_desc)
+        # Now update docs with Groq.
+        updated_docs = update_docs(closest_match, code_diffs)
+        summary = {
+            "commit_id": payload['after'],
+            "commit_message": payload['head_commit']['message'],
+            "relevant_doc": closest_match['metadata']['title'],
+            "doc_url": closest_match['metadata']['url'],
+            "code_summary": code_desc,
+            "doc_updates": updated_docs
+        }
+        
+        # Read existing updates
+        try:
+            with open(UPDATES_FILE, 'r') as f:
+                updates = json.load(f)
+                if not isinstance(updates, list):
+                    updates = [updates] if updates else []
+        except (FileNotFoundError, json.JSONDecodeError):
+            updates = []
+        
+        # Append new update
+        updates.append(summary)
+        
+        # Keep only the last 10 updates (or adjust as needed)
+        updates = updates[-10:]
+        
+        # Write updated list back to file
+        with open(UPDATES_FILE, 'w') as f:
+            json.dump(updates, f)
+        
+        return {"status": "success", "message": "Updates processed and stored"}
+    
+@app.get("/api/recent-updates")
+async def get_recent_updates():
+    try:
+        with open(UPDATES_FILE, 'r') as f:
+            updates = json.load(f)
+        return updates
+    except FileNotFoundError:
+        return {"status": "no updates", "message": "No recent updates found"}
 
 
 def get_commit_details(owner: str, repo: str, commit_sha: str):
@@ -48,9 +87,20 @@ def get_commit_details(owner: str, repo: str, commit_sha: str):
     response = requests.get(url)
     if response.status_code == 200:
         commit_data = response.json()
-        return commit_data['files']
+        files_data = commit_data['files']
+        
+        file_changes = []
+        for file in files_data:
+            file_changes.append({
+                'filename': file['filename'],
+                'patch': file.get('patch', '')
+            })
+        
+        return file_changes
     else:
         print(f"Error fetching commit details: {response.status_code} {response.text}")
         return None
+
+
 
 
