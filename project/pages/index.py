@@ -14,6 +14,7 @@ class Update(rx.Base):
 
 class RecentUpdatesState(State):
     updates: List[Update] = []
+    selected_update: Update = None
 
     def get_recent_updates(self):
         try:
@@ -26,52 +27,62 @@ class RecentUpdatesState(State):
             print(f"Error fetching recent updates: {e}")
             self.updates = []
 
-def recent_updates_component():
+    def select_update(self, update_id: str):
+        self.selected_update = next((u for u in self.updates if u.commit_id == update_id), None)
+
+def sidebar_component():
     return rx.vstack(
-        rx.heading("Recent Updates", size="lg", mb=4),
-        rx.cond(
+        rx.heading("Commits", size="md", mb=4),
+        rx.foreach(
             RecentUpdatesState.updates,
-            rx.foreach(
-                RecentUpdatesState.updates,
-                lambda update: rx.box(
-                    rx.vstack(
-                        rx.hstack(
-                            rx.text("Commit ID: ", font_weight="bold"),
-                            rx.text(update.commit_id),
-                            width="100%",
-                        ),
-                        rx.text(update.commit_message, font_style="italic", mb=2),
-                        rx.hstack(
-                            rx.text("Relevant Doc: ", font_weight="bold"),
-                            rx.link(update.relevant_doc, href=update.doc_url, is_external=True),
-                            width="100%",
-                        ),
-                        rx.text("Code Summary:", font_weight="bold"),
-                        rx.text(update.code_summary, mb=2),
-                        rx.text("Doc Updates:", font_weight="bold"),
-                        rx.markdown(update.doc_updates),
-                        align_items="start",
-                        spacing="0.5em",
-                    ),
-                    padding="1em",
-                    border="1px solid #e0e0e0",
-                    border_radius="md",
-                    box_shadow="sm",
-                    margin="1em",
-                )
+            lambda update: rx.button(
+                update.commit_id,
+                on_click=RecentUpdatesState.select_update(update.commit_id),
+                width="100%",
+                justify_content="flex-start",
+                py=2,
+                variant="ghost",
+            )
+        ),
+        width="250px",
+        height="100vh",
+        border_right="1px solid #e0e0e0",
+        padding="1em",
+    )
+
+def main_content():
+    return rx.cond(
+        RecentUpdatesState.selected_update,
+        rx.vstack(
+            rx.heading(RecentUpdatesState.selected_update.commit_message, size="lg", mb=4),
+            rx.hstack(
+                rx.text("Relevant Doc: ", font_weight="bold"),
+                rx.link(
+                    RecentUpdatesState.selected_update.relevant_doc,
+                    href=RecentUpdatesState.selected_update.doc_url,
+                    is_external=True
+                ),
+                width="100%",
             ),
-            rx.text("No updates available.", font_style="italic"),
-        )
+            rx.text("Code Summary:", font_weight="bold"),
+            rx.text(RecentUpdatesState.selected_update.code_summary, mb=2),
+            rx.text("Doc Updates:", font_weight="bold"),
+            rx.markdown(RecentUpdatesState.selected_update.doc_updates),
+            align_items="start",
+            spacing="0.5em",
+            width="100%",
+            padding="2em",
+        ),
+        rx.text("Select a commit from the sidebar to view details.", font_style="italic"),
     )
 
 # Update the page definition
 @rx.page("/")
 def index():
-    return rx.vstack(
-        rx.heading("Documentation Updater", size="2xl", mb=6),
-        recent_updates_component(),
+    return rx.hstack(
+        sidebar_component(),
+        main_content(),
         on_mount=RecentUpdatesState.get_recent_updates,
-        margin="0 auto",
-        padding="2em",
-        min_height="100vh",
+        width="100%",
+        height="100vh",
     )
