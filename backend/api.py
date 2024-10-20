@@ -1,11 +1,8 @@
 # api.py
-import json
-import xmltojson
-from fastapi import FastAPI, Request, status
-from fastapi.responses import JSONResponse
+from fastapi import FastAPI, Request
+from backend.utils.utils import generate_code_description
 import requests
-import chromadb
-
+# Specify the path to the .env file
 app = FastAPI()
 
 """
@@ -28,23 +25,23 @@ async def read_root():
 # Webhook endpoint to listen for POST requests
 @app.post("/api/webhook")
 async def handle_webhook(request: Request):
-    print(request.headers)
     payload = await request.json()
     # Initialize lists for storing file content
     if payload['ref'] == "refs/heads/main" or payload['ref'] == "refs/heads/master" or payload['ref'] == "refs/heads/develop":
         owner = payload['repository']['owner']['name']
         name = payload['repository']['name']
         code_diffs =  get_commit_details(owner, name, payload['after'])
+        print(code_diffs)
         # TODO: take the code diffs adn generate a code change description based on it
         # using openai
-        
+        code_desc = generate_code_description(code_diffs)
+        print(code_desc)
         return 200
-
 
 
 def get_commit_details(owner: str, repo: str, commit_sha: str):
     """
-    Returns the details for a specific commit
+    Returns the details for files changed in a specific commit
     """
     # Construct the Commit API URL
     url = f"https://api.github.com/repos/{owner}/{repo}/commits/{commit_sha}"
@@ -59,25 +56,3 @@ def get_commit_details(owner: str, repo: str, commit_sha: str):
         return None
 
 
-def generate_code_description(text: str):
-    prompt = f"""
-    You are given a document and a code description.
-
-    The document is:
-    {most_similar_doc}
-
-    The code description is:
-    {code_description}
-
-    Based on the provided document and code description, generate a new document that incorporates both the information from the document and details from the code description.
-    """
-
-    # Whatever chat model
-    response = openai.Completion.create(
-        model="gpt-4",  # or "gpt-3.5-turbo" depending on your subscription
-        prompt=prompt,
-        max_tokens=1000  # Adjust based on document size
-    )
-
-    new_document = response.choices[0].text.strip()
-    return new_document
