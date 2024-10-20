@@ -28,21 +28,39 @@ class RecentUpdatesState(State):
 
 def recent_updates_component():
     return rx.vstack(
-        rx.heading("Recent Updates"),
-        rx.button("Fetch Updates", on_click=RecentUpdatesState.get_recent_updates),
-        rx.foreach(
+        rx.heading("Recent Updates", size="lg", mb=4),
+        rx.cond(
             RecentUpdatesState.updates,
-            lambda update: rx.box(
-                rx.text("Commit ID: ", update.commit_id),
-                rx.text("Commit Message: ", update.commit_message),
-                rx.text("Relevant Doc: ", update.relevant_doc),
-                rx.link("Doc URL: ", update.doc_url, href=update.doc_url, is_external=True),
-                rx.text("Code Summary: ", update.code_summary),
-                rx.text("Doc Updates: ", update.doc_updates),
-                padding="1em",
-                border="1px solid #ccc",
-                margin="1em",
-            )
+            rx.foreach(
+                RecentUpdatesState.updates,
+                lambda update: rx.box(
+                    rx.vstack(
+                        rx.hstack(
+                            rx.text("Commit ID: ", font_weight="bold"),
+                            rx.text(update.commit_id),
+                            width="100%",
+                        ),
+                        rx.text(update.commit_message, font_style="italic", mb=2),
+                        rx.hstack(
+                            rx.text("Relevant Doc: ", font_weight="bold"),
+                            rx.link(update.relevant_doc, href=update.doc_url, is_external=True),
+                            width="100%",
+                        ),
+                        rx.text("Code Summary:", font_weight="bold"),
+                        rx.text(update.code_summary, mb=2),
+                        rx.text("Doc Updates:", font_weight="bold"),
+                        rx.text(update.doc_updates),
+                        align_items="start",
+                        spacing="0.5em",
+                    ),
+                    padding="1em",
+                    border="1px solid #e0e0e0",
+                    border_radius="md",
+                    box_shadow="sm",
+                    margin="1em",
+                )
+            ),
+            rx.text("No updates available.", font_style="italic"),
         )
     )
 
@@ -50,6 +68,10 @@ def recent_updates_component():
 @rx.page("/")
 def index():
     return rx.vstack(
-        rx.heading("Welcome to the Documentation Updater"),
-        recent_updates_component()
+        rx.heading("Documentation Updater", size="2xl", mb=6),
+        recent_updates_component(),
+        on_mount=RecentUpdatesState.get_recent_updates,
+        margin="0 auto",
+        padding="2em",
+        min_height="100vh",
     )
