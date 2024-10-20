@@ -1,6 +1,7 @@
 import reflex as rx
 from project.pages import *
 from backend.api import app as fastapi_app 
+from dotenv import load_dotenv
 
 class State(rx.State):
     """Define empty state to allow access to rx.State.router."""
