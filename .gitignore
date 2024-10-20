@@ -9,5 +9,3 @@ backend/.env
 myenv/*
 .env
 
-myenv/*
-.env
