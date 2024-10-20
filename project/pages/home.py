@@ -75,7 +75,7 @@ def render_getting_started_text():
 
 def render_link_repository_box():
     return rx.hstack(
-        rx.input(
+        rx.vstack(rx.input(
             placeholder="Link your repository",
             value=DashboardState.repo_link,
             font_family="Helvetica Neue LT Std",
@@ -87,6 +87,18 @@ def render_link_repository_box():
             padding_left="10px",
             background="transparent"
         ),
+        rx.input(
+            placeholder="Link your documentation",
+            value=DashboardState.repo_link,
+            font_family="Helvetica Neue LT Std",
+            font_size="32px",
+            color="black",
+            width="521px",
+            height="56px",
+            border="1px solid #C48DFF",
+            padding_left="10px",
+            background="transparent"
+        )),
         rx.button(
             rx.icon(
                 tag="chevron-right",
