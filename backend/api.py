@@ -32,8 +32,6 @@ async def handle_webhook(request: Request):
         name = payload['repository']['name']
         code_diffs =  get_commit_details(owner, name, payload['after'])
         print(code_diffs)
-        # TODO: take the code diffs adn generate a code change description based on it
-        # using openai
         code_desc = generate_code_description(code_diffs)
         print(code_desc)
         return 200
